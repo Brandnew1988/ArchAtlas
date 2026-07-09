@@ -31,6 +31,24 @@ Recommended behavior:
 
 The Scan Summary should not become a dashboard. It should act as a simple bridge into the Atlas.
 
+## Layout decision: Insights panel
+
+The **Insights** panel should be visible by default, but collapsible.
+
+Reason:
+
+- Insights is central to the product because it explains the selected object.
+- Keeping it visible reinforces that ArchAtlas is about understanding, not only visualization.
+- Making it collapsible gives power users more atlas space when they need it.
+- The user should never be forced into a fixed layout.
+
+Recommended behavior:
+
+- Default state: Insights visible.
+- User can collapse Insights to give the Software Atlas more room.
+- Collapsed state should remain easy to reopen.
+- The first prototype should support this interaction if it is cheap to implement.
+
 ## Mockup 1: Welcome / start screen
 
 ### Goal
@@ -170,7 +188,7 @@ Make the map the hero while still offering structure and context.
 | Menu | Explorer                    | Software Atlas                | Insights  |
 |------|-----------------------------|-------------------------------|-----------|
 |      | Views                       |                               | Selected  |
-|      |                             |            ○ API              |           |
+|      |                             |            ○ API              |       [<] |
 |      |   • System Map ◀ active     |              │                | Solution  |
 |      |   • Method Paths            |              ▼                |           |
 |      |   • Rules                   |       ○ Application           | Purpose   |
@@ -193,6 +211,7 @@ Make the map the hero while still offering structure and context.
 - Explorer is navigation, not the main product.
 - Views are shown before Projects because the user first chooses how to understand the system.
 - Insights explains the selected element.
+- Insights is visible by default, but can be collapsed.
 - Search should be available globally.
 
 ## Mockup 5: Main atlas view — project selected
@@ -208,7 +227,7 @@ Show that selecting a node explains its role in the system.
 | Menu | Explorer                    | Software Atlas                | Insights  |
 |------|-----------------------------|-------------------------------|-----------|
 |      | Views                       |                               | Application|
-|      |                             |            ○ API              |           |
+|      |                             |            ○ API              |       [<] |
 |      |   • System Map ◀ active     |              │                | Purpose   |
 |      |   • Method Paths            |              ▼                | Coordinates|
 |      |   • Rules                   |       ◎ Application           | business  |
@@ -247,7 +266,7 @@ Show class-level understanding without becoming a property grid.
 | Menu | Explorer                    | Software Atlas                | Insights  |
 |------|-----------------------------|-------------------------------|-----------|
 |      | Application                 |                               | OrderHandler|
-|      |                             |        ○ ImportOrderHandler   |           |
+|      |                             |        ○ ImportOrderHandler   |       [<] |
 |      | ▾ Handlers                  |              │                | Purpose   |
 |      |   • ImportOrderHandler ◀    |              ▼                | Coordinates|
 |      |   • CancelOrderHandler      |       ◎ OrderHandler          | order     |
@@ -289,7 +308,7 @@ Make method path exploration feel alive, like route navigation.
 | Menu | Explorer                    | Software Atlas                | Insights  |
 |------|-----------------------------|-------------------------------|-----------|
 |      | Method Paths                |                               | Path      |
-|      |                             |   1 ◎ Run()                   |           |
+|      |                             |   1 ◎ Run()                   |       [<] |
 |      | ▾ Order Import             |       │                       | Order     |
 |      |   • Run() ◀ selected        |       ▼                       | Import    |
 |      |   • Handle()               |   2 ◎ Handle()                |           |
@@ -325,7 +344,7 @@ Warnings should explain why something matters.
 | Menu | Explorer                    | Software Atlas                | Insights  |
 |------|-----------------------------|-------------------------------|-----------|
 |      | Rules                       |                               | Warning   |
-|      |                             |   ○ API                       |           |
+|      |                             |   ○ API                       |       [<] |
 |      | ⚠ API direct repository     |     │                         | API calls |
 |      |   call                      |     ▼                         | Repository|
 |      |                             |   ⚠ Repository                | directly  |
@@ -362,7 +381,7 @@ Show AI as an overlay, not the whole product.
 | Menu | Explorer                    | Software Atlas                | Insights  |
 |------|-----------------------------|-------------------------------|-----------|
 |      | Views                       |                               | AI Impact |
-|      |                             |            ○ API              |           |
+|      |                             |            ○ API              |       [<] |
 |      |   • System Map              |              │                | Compared  |
 |      |   • Method Paths            |              ▼                | to main   |
 |      |   • Rules                   |       ◎ Application           |           |
@@ -385,12 +404,11 @@ Show AI as an overlay, not the whole product.
 
 ## Key open questions after first mockups
 
-1. Should Insights be collapsible?
-2. Should the left Explorer show files ever, or only logical architecture objects?
-3. How should confidence be shown without making the UI noisy?
-4. Should the first prototype include AI Changes, or only System Map + Method Paths + Warnings?
-5. Should warnings appear as badges on nodes or only as a separate overlay?
-6. How much animation is useful before it becomes distracting?
+1. Should the left Explorer show files ever, or only logical architecture objects?
+2. How should confidence be shown without making the UI noisy?
+3. Should the first prototype include AI Changes, or only System Map + Method Paths + Warnings?
+4. Should warnings appear as badges on nodes or only as a separate overlay?
+5. How much animation is useful before it becomes distracting?
 
 ## Current recommended prototype flow
 
