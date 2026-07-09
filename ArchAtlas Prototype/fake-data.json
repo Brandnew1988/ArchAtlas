@@ -1,0 +1,672 @@
+{
+  "repository": {
+    "id": "repo-orderflow",
+    "name": "OrderFlow",
+    "branch": "feature/order-import-messaging",
+    "comparedTo": "main",
+    "lastScanned": "Today",
+    "scanMode": "fake-prototype-data",
+    "summary": {
+      "projects": 5,
+      "namespaces": 18,
+      "classes": 42,
+      "methods": 184,
+      "architectureChecks": {
+        "passed": 4,
+        "warnings": 1
+      },
+      "externalSystems": [
+        "SQL Server",
+        "Azure Service Bus",
+        "External Order API"
+      ]
+    }
+  },
+  "views": [
+    {
+      "id": "system-map",
+      "label": "System Map",
+      "description": "High-level project and dependency overview."
+    },
+    {
+      "id": "method-paths",
+      "label": "Method Paths",
+      "description": "Follow execution paths through the system."
+    },
+    {
+      "id": "rules",
+      "label": "Rules",
+      "description": "Architecture rules and warnings."
+    },
+    {
+      "id": "change-impact",
+      "label": "Change Impact",
+      "description": "Understand what changed compared to another branch or scan."
+    }
+  ],
+  "projects": [
+    {
+      "id": "project-api",
+      "name": "OrderFlow.Api",
+      "type": "project",
+      "layer": "api",
+      "description": "HTTP and function entry points for order workflows.",
+      "evidence": "Verified from code",
+      "sourceLocation": {
+        "project": "OrderFlow.Api",
+        "path": "src/OrderFlow.Api/OrderFlow.Api.csproj"
+      }
+    },
+    {
+      "id": "project-application",
+      "name": "OrderFlow.Application",
+      "type": "project",
+      "layer": "application",
+      "description": "Coordinates business flows and application use cases.",
+      "evidence": "Derived from graph",
+      "sourceLocation": {
+        "project": "OrderFlow.Application",
+        "path": "src/OrderFlow.Application/OrderFlow.Application.csproj"
+      }
+    },
+    {
+      "id": "project-domain",
+      "name": "OrderFlow.Domain",
+      "type": "project",
+      "layer": "domain",
+      "description": "Domain entities and business concepts for orders.",
+      "evidence": "Derived from graph",
+      "sourceLocation": {
+        "project": "OrderFlow.Domain",
+        "path": "src/OrderFlow.Domain/OrderFlow.Domain.csproj"
+      }
+    },
+    {
+      "id": "project-infrastructure",
+      "name": "OrderFlow.Infrastructure",
+      "type": "project",
+      "layer": "infrastructure",
+      "description": "Persistence, database access, and external API integrations.",
+      "evidence": "Derived from graph",
+      "sourceLocation": {
+        "project": "OrderFlow.Infrastructure",
+        "path": "src/OrderFlow.Infrastructure/OrderFlow.Infrastructure.csproj"
+      }
+    },
+    {
+      "id": "project-messaging",
+      "name": "OrderFlow.Messaging",
+      "type": "project",
+      "layer": "messaging",
+      "description": "Publishes and handles messages related to order events.",
+      "evidence": "Derived from graph",
+      "sourceLocation": {
+        "project": "OrderFlow.Messaging",
+        "path": "src/OrderFlow.Messaging/OrderFlow.Messaging.csproj"
+      }
+    }
+  ],
+  "externalSystems": [
+    {
+      "id": "external-sql-server",
+      "name": "SQL Server",
+      "type": "external-system",
+      "description": "Stores imported orders and order status.",
+      "evidence": "Derived from graph"
+    },
+    {
+      "id": "external-service-bus",
+      "name": "Azure Service Bus",
+      "type": "external-system",
+      "description": "Receives order published messages.",
+      "evidence": "Derived from graph"
+    },
+    {
+      "id": "external-order-api",
+      "name": "External Order API",
+      "type": "external-system",
+      "description": "External service used to enrich order details.",
+      "evidence": "Derived from graph"
+    }
+  ],
+  "classes": [
+    {
+      "id": "class-import-order-function",
+      "name": "ImportOrderFunction",
+      "type": "class",
+      "projectId": "project-api",
+      "namespace": "OrderFlow.Api.Functions",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "Entry point for the Order Import Flow.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [
+        "method-import-order-function-run"
+      ],
+      "calls": [
+        "class-import-order-handler"
+      ],
+      "sourceLocation": {
+        "project": "OrderFlow.Api",
+        "namespace": "OrderFlow.Api.Functions",
+        "path": "src/OrderFlow.Api/ImportOrderFunction.cs",
+        "line": 18
+      },
+      "evidence": "Verified from code"
+    },
+    {
+      "id": "class-order-controller",
+      "name": "OrderController",
+      "type": "class",
+      "projectId": "project-api",
+      "namespace": "OrderFlow.Api.Controllers",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "HTTP API surface for order operations.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [],
+      "calls": [
+        "class-import-order-handler",
+        "class-cancel-order-handler"
+      ],
+      "sourceLocation": {
+        "project": "OrderFlow.Api",
+        "namespace": "OrderFlow.Api.Controllers",
+        "path": "src/OrderFlow.Api/OrderController.cs",
+        "line": 12
+      },
+      "evidence": "Verified from code"
+    },
+    {
+      "id": "class-import-order-handler",
+      "name": "ImportOrderHandler",
+      "type": "class",
+      "projectId": "project-application",
+      "namespace": "OrderFlow.Application.Orders",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "Part of the Order Import Flow.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [
+        "method-import-order-handler-handle"
+      ],
+      "calls": [
+        "class-order-validator",
+        "class-order-repository",
+        "class-order-published-publisher"
+      ],
+      "usedBy": [
+        "class-import-order-function",
+        "class-order-controller"
+      ],
+      "sourceLocation": {
+        "project": "OrderFlow.Application",
+        "namespace": "OrderFlow.Application.Orders",
+        "path": "src/OrderFlow.Application/Orders/ImportOrderHandler.cs",
+        "line": 24
+      },
+      "evidence": "Verified from code",
+      "isChanged": true
+    },
+    {
+      "id": "class-cancel-order-handler",
+      "name": "CancelOrderHandler",
+      "type": "class",
+      "projectId": "project-application",
+      "namespace": "OrderFlow.Application.Orders",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "Handles order cancellation flow.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [],
+      "calls": [],
+      "sourceLocation": {
+        "project": "OrderFlow.Application",
+        "namespace": "OrderFlow.Application.Orders",
+        "path": "src/OrderFlow.Application/Orders/CancelOrderHandler.cs",
+        "line": 21
+      },
+      "evidence": "Verified from code"
+    },
+    {
+      "id": "class-order-validator",
+      "name": "OrderValidator",
+      "type": "class",
+      "projectId": "project-application",
+      "namespace": "OrderFlow.Application.Orders",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "Validates imported order commands before persistence.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [
+        "method-order-validator-validate"
+      ],
+      "calls": [],
+      "sourceLocation": {
+        "project": "OrderFlow.Application",
+        "namespace": "OrderFlow.Application.Orders",
+        "path": "src/OrderFlow.Application/Orders/OrderValidator.cs",
+        "line": 15
+      },
+      "evidence": "Verified from code"
+    },
+    {
+      "id": "class-order-service",
+      "name": "OrderService",
+      "type": "class",
+      "projectId": "project-application",
+      "namespace": "OrderFlow.Application.Orders",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "Shared application service for order operations.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [],
+      "calls": [],
+      "sourceLocation": {
+        "project": "OrderFlow.Application",
+        "namespace": "OrderFlow.Application.Orders",
+        "path": "src/OrderFlow.Application/Orders/OrderService.cs",
+        "line": 12
+      },
+      "evidence": "Verified from code"
+    },
+    {
+      "id": "class-order",
+      "name": "Order",
+      "type": "class",
+      "projectId": "project-domain",
+      "namespace": "OrderFlow.Domain.Orders",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "Core domain entity for orders.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [],
+      "calls": [],
+      "sourceLocation": {
+        "project": "OrderFlow.Domain",
+        "namespace": "OrderFlow.Domain.Orders",
+        "path": "src/OrderFlow.Domain/Orders/Order.cs",
+        "line": 7
+      },
+      "evidence": "Verified from code"
+    },
+    {
+      "id": "class-order-repository",
+      "name": "OrderRepository",
+      "type": "class",
+      "projectId": "project-infrastructure",
+      "namespace": "OrderFlow.Infrastructure.Orders",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "Persists imported orders to SQL Server.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [
+        "method-order-repository-save"
+      ],
+      "calls": [
+        "external-sql-server"
+      ],
+      "sourceLocation": {
+        "project": "OrderFlow.Infrastructure",
+        "namespace": "OrderFlow.Infrastructure.Orders",
+        "path": "src/OrderFlow.Infrastructure/Orders/OrderRepository.cs",
+        "line": 31
+      },
+      "evidence": "Verified from code",
+      "isChanged": true
+    },
+    {
+      "id": "class-order-db-context",
+      "name": "OrderDbContext",
+      "type": "class",
+      "projectId": "project-infrastructure",
+      "namespace": "OrderFlow.Infrastructure.Persistence",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "Database context for order persistence.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [],
+      "calls": [
+        "external-sql-server"
+      ],
+      "sourceLocation": {
+        "project": "OrderFlow.Infrastructure",
+        "namespace": "OrderFlow.Infrastructure.Persistence",
+        "path": "src/OrderFlow.Infrastructure/Persistence/OrderDbContext.cs",
+        "line": 9
+      },
+      "evidence": "Verified from code"
+    },
+    {
+      "id": "class-external-order-client",
+      "name": "ExternalOrderClient",
+      "type": "class",
+      "projectId": "project-infrastructure",
+      "namespace": "OrderFlow.Infrastructure.ExternalOrders",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "Calls the External Order API for order enrichment.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [],
+      "calls": [
+        "external-order-api"
+      ],
+      "sourceLocation": {
+        "project": "OrderFlow.Infrastructure",
+        "namespace": "OrderFlow.Infrastructure.ExternalOrders",
+        "path": "src/OrderFlow.Infrastructure/ExternalOrders/ExternalOrderClient.cs",
+        "line": 17
+      },
+      "evidence": "Verified from code"
+    },
+    {
+      "id": "class-order-published-publisher",
+      "name": "OrderPublishedPublisher",
+      "type": "class",
+      "projectId": "project-messaging",
+      "namespace": "OrderFlow.Messaging.Orders",
+      "purpose": {
+        "text": "Unknown",
+        "evidence": "Unknown"
+      },
+      "role": {
+        "text": "Publishes order imported messages to Azure Service Bus.",
+        "evidence": "Derived from graph"
+      },
+      "methods": [
+        "method-order-published-publisher-publish"
+      ],
+      "calls": [
+        "external-service-bus"
+      ],
+      "sourceLocation": {
+        "project": "OrderFlow.Messaging",
+        "namespace": "OrderFlow.Messaging.Orders",
+        "path": "src/OrderFlow.Messaging/OrderPublishedPublisher.cs",
+        "line": 19
+      },
+      "evidence": "Verified from code",
+      "isChanged": true
+    }
+  ],
+  "methods": [
+    {
+      "id": "method-import-order-function-run",
+      "name": "Run",
+      "fullName": "ImportOrderFunction.Run()",
+      "classId": "class-import-order-function",
+      "sourceLocation": {
+        "path": "src/OrderFlow.Api/ImportOrderFunction.cs",
+        "line": 28
+      },
+      "evidence": "Verified from code"
+    },
+    {
+      "id": "method-import-order-handler-handle",
+      "name": "Handle",
+      "fullName": "ImportOrderHandler.Handle()",
+      "classId": "class-import-order-handler",
+      "sourceLocation": {
+        "path": "src/OrderFlow.Application/Orders/ImportOrderHandler.cs",
+        "line": 42
+      },
+      "evidence": "Verified from code",
+      "isChanged": true
+    },
+    {
+      "id": "method-order-validator-validate",
+      "name": "Validate",
+      "fullName": "OrderValidator.Validate()",
+      "classId": "class-order-validator",
+      "sourceLocation": {
+        "path": "src/OrderFlow.Application/Orders/OrderValidator.cs",
+        "line": 22
+      },
+      "evidence": "Verified from code"
+    },
+    {
+      "id": "method-order-repository-save",
+      "name": "Save",
+      "fullName": "OrderRepository.Save()",
+      "classId": "class-order-repository",
+      "sourceLocation": {
+        "path": "src/OrderFlow.Infrastructure/Orders/OrderRepository.cs",
+        "line": 88
+      },
+      "evidence": "Verified from code",
+      "isChanged": true
+    },
+    {
+      "id": "method-order-published-publisher-publish",
+      "name": "Publish",
+      "fullName": "OrderPublishedPublisher.Publish()",
+      "classId": "class-order-published-publisher",
+      "sourceLocation": {
+        "path": "src/OrderFlow.Messaging/OrderPublishedPublisher.cs",
+        "line": 36
+      },
+      "evidence": "Verified from code",
+      "isChanged": true
+    }
+  ],
+  "graph": {
+    "nodes": [
+      { "id": "project-api", "label": "API", "kind": "project", "level": 1 },
+      { "id": "project-application", "label": "Application", "kind": "project", "level": 2, "isChanged": true },
+      { "id": "project-domain", "label": "Domain", "kind": "project", "level": 3 },
+      { "id": "project-infrastructure", "label": "Infrastructure", "kind": "project", "level": 3, "isChanged": true },
+      { "id": "project-messaging", "label": "Messaging", "kind": "project", "level": 3, "isChanged": true },
+      { "id": "external-sql-server", "label": "SQL Server", "kind": "external-system", "level": 4 },
+      { "id": "external-service-bus", "label": "Azure Service Bus", "kind": "external-system", "level": 4, "isChanged": true },
+      { "id": "external-order-api", "label": "External Order API", "kind": "external-system", "level": 4 }
+    ],
+    "edges": [
+      { "id": "edge-api-application", "source": "project-api", "target": "project-application", "type": "depends-on", "evidence": "Verified from code" },
+      { "id": "edge-application-domain", "source": "project-application", "target": "project-domain", "type": "depends-on", "evidence": "Verified from code" },
+      { "id": "edge-application-infrastructure", "source": "project-application", "target": "project-infrastructure", "type": "depends-on", "evidence": "Verified from code" },
+      { "id": "edge-application-messaging", "source": "project-application", "target": "project-messaging", "type": "depends-on", "evidence": "Verified from code", "isChanged": true, "warningId": "warning-application-direct-messaging" },
+      { "id": "edge-infrastructure-sql", "source": "project-infrastructure", "target": "external-sql-server", "type": "writes-to", "evidence": "Derived from graph" },
+      { "id": "edge-infrastructure-external-order-api", "source": "project-infrastructure", "target": "external-order-api", "type": "calls", "evidence": "Derived from graph" },
+      { "id": "edge-messaging-service-bus", "source": "project-messaging", "target": "external-service-bus", "type": "publishes-to", "evidence": "Derived from graph", "isChanged": true }
+    ]
+  },
+  "methodPaths": [
+    {
+      "id": "path-order-import",
+      "name": "Order Import Flow",
+      "description": "Imports an order, validates it, saves it, and publishes an order event.",
+      "evidence": "Derived from graph",
+      "steps": [
+        {
+          "order": 1,
+          "methodId": "method-import-order-function-run",
+          "classId": "class-import-order-function",
+          "label": "ImportOrderFunction.Run()"
+        },
+        {
+          "order": 2,
+          "methodId": "method-import-order-handler-handle",
+          "classId": "class-import-order-handler",
+          "label": "ImportOrderHandler.Handle()",
+          "isChanged": true
+        },
+        {
+          "order": 3,
+          "methodId": "method-order-validator-validate",
+          "classId": "class-order-validator",
+          "label": "OrderValidator.Validate()"
+        },
+        {
+          "order": 4,
+          "methodId": "method-order-repository-save",
+          "classId": "class-order-repository",
+          "label": "OrderRepository.Save()",
+          "touches": ["external-sql-server"],
+          "isChanged": true
+        },
+        {
+          "order": 5,
+          "methodId": "method-order-published-publisher-publish",
+          "classId": "class-order-published-publisher",
+          "label": "OrderPublishedPublisher.Publish()",
+          "touches": ["external-service-bus"],
+          "isChanged": true
+        }
+      ],
+      "touches": [
+        "SQL Server",
+        "Azure Service Bus"
+      ],
+      "warnings": [
+        "warning-application-direct-messaging"
+      ]
+    }
+  ],
+  "warnings": [
+    {
+      "id": "warning-application-direct-messaging",
+      "severity": "warning",
+      "title": "Application depends directly on Messaging",
+      "summary": "OrderFlow.Application now references OrderFlow.Messaging directly.",
+      "whyItMatters": "Application code should normally publish through an abstraction to avoid coupling business flow directly to messaging infrastructure.",
+      "rule": "Application should not depend directly on Messaging implementation.",
+      "evidence": "Derived from graph",
+      "affectedNodes": [
+        "project-application",
+        "project-messaging",
+        "class-import-order-handler",
+        "class-order-published-publisher"
+      ],
+      "sourceLocations": [
+        {
+          "path": "src/OrderFlow.Application/Orders/ImportOrderHandler.cs",
+          "line": 42
+        },
+        {
+          "path": "src/OrderFlow.Messaging/OrderPublishedPublisher.cs",
+          "line": 19
+        }
+      ]
+    }
+  ],
+  "changeImpact": {
+    "id": "change-impact-feature-order-import-messaging",
+    "label": "Change Impact",
+    "comparedTo": "main",
+    "branch": "feature/order-import-messaging",
+    "evidence": "Derived from graph",
+    "summary": {
+      "changedFiles": 5,
+      "changedClasses": 3,
+      "changedMethods": 6,
+      "changedDependencies": 1,
+      "affectedPaths": 1,
+      "warnings": 1
+    },
+    "changedFiles": [
+      "src/OrderFlow.Application/Orders/ImportOrderHandler.cs",
+      "src/OrderFlow.Infrastructure/Orders/OrderRepository.cs",
+      "src/OrderFlow.Messaging/OrderPublishedPublisher.cs",
+      "src/OrderFlow.Messaging/OrderImportedMessage.cs",
+      "src/OrderFlow.Application/OrderFlow.Application.csproj"
+    ],
+    "changedNodes": [
+      "project-application",
+      "project-infrastructure",
+      "project-messaging",
+      "class-import-order-handler",
+      "class-order-repository",
+      "class-order-published-publisher",
+      "external-service-bus"
+    ],
+    "changedEdges": [
+      "edge-application-messaging",
+      "edge-messaging-service-bus"
+    ],
+    "affectedMethodPaths": [
+      "path-order-import"
+    ],
+    "warnings": [
+      "warning-application-direct-messaging"
+    ],
+    "reviewPriority": [
+      {
+        "label": "Review new Application -> Messaging dependency",
+        "sourceLocation": {
+          "path": "src/OrderFlow.Application/Orders/ImportOrderHandler.cs",
+          "line": 42
+        },
+        "reason": "This introduces a direct dependency from the Application layer to the Messaging implementation.",
+        "evidence": "Derived from graph"
+      },
+      {
+        "label": "Review message publishing implementation",
+        "sourceLocation": {
+          "path": "src/OrderFlow.Messaging/OrderPublishedPublisher.cs",
+          "line": 36
+        },
+        "reason": "This is where the order event is published to Azure Service Bus.",
+        "evidence": "Verified from code"
+      },
+      {
+        "label": "Review changed persistence behavior",
+        "sourceLocation": {
+          "path": "src/OrderFlow.Infrastructure/Orders/OrderRepository.cs",
+          "line": 88
+        },
+        "reason": "The order save method is part of the affected order import path.",
+        "evidence": "Derived from graph"
+      }
+    ]
+  },
+  "prototypeFlow": [
+    "welcome",
+    "scan-progress",
+    "scan-summary",
+    "system-map",
+    "project-insights",
+    "class-insights",
+    "method-path",
+    "change-impact"
+  ]
+}
