@@ -5,92 +5,112 @@ type Screen =
   | 'welcome'
   | 'scan-progress'
   | 'scan-summary'
-  | 'system-map'
-  | 'class-insights'
-  | 'method-path'
-  | 'change-impact';
+  | 'atlas';
 
-const screens: { id: Screen; label: string }[] = [
+type AtlasView = 'system-map' | 'method-paths' | 'rules' | 'change-impact';
+type SelectionType = 'project' | 'class' | 'external-system' | 'method-path' | 'warning' | 'change-impact';
+
+type Selection = {
+  type: SelectionType;
+  id: string;
+};
+
+type AtlasNodePosition = {
+  id: string;
+  x: number;
+  y: number;
+  label: string;
+};
+
+const flowScreens: { id: Screen; label: string }[] = [
   { id: 'welcome', label: 'Welcome' },
   { id: 'scan-progress', label: 'Scan' },
   { id: 'scan-summary', label: 'Summary' },
-  { id: 'system-map', label: 'Atlas' },
-  { id: 'class-insights', label: 'Class' },
-  { id: 'method-path', label: 'Path' },
-  { id: 'change-impact', label: 'Impact' },
+  { id: 'atlas', label: 'Atlas' },
 ];
 
-const selectedProject = fakeData.projects.find((project) => project.id === 'project-application')!;
-const selectedClass = fakeData.classes.find((item) => item.id === 'class-import-order-handler')!;
+const atlasNodePositions: AtlasNodePosition[] = [
+  { id: 'project-api', label: 'API', x: 80, y: 90 },
+  { id: 'project-application', label: 'Application', x: 370, y: 210 },
+  { id: 'project-domain', label: 'Domain', x: 150, y: 410 },
+  { id: 'project-infrastructure', label: 'Infrastructure', x: 370, y: 430 },
+  { id: 'project-messaging', label: 'Messaging', x: 610, y: 410 },
+  { id: 'external-order-api', label: 'External API', x: 115, y: 610 },
+  { id: 'external-sql-server', label: 'SQL Server', x: 390, y: 640 },
+  { id: 'external-service-bus', label: 'Service Bus', x: 625, y: 620 },
+];
+
 const methodPath = fakeData.methodPaths[0];
 const warning = fakeData.warnings[0];
 const changeImpact = fakeData.changeImpact;
 
 function App() {
   const [screen, setScreen] = React.useState<Screen>('welcome');
+  const [activeView, setActiveView] = React.useState<AtlasView>('system-map');
+  const [selection, setSelection] = React.useState<Selection>({ type: 'project', id: 'project-application' });
   const [insightsCollapsed, setInsightsCollapsed] = React.useState(false);
 
   const goNext = () => {
-    const index = screens.findIndex((item) => item.id === screen);
-    const next = screens[Math.min(index + 1, screens.length - 1)];
+    const index = flowScreens.findIndex((item) => item.id === screen);
+    const next = flowScreens[Math.min(index + 1, flowScreens.length - 1)];
     setScreen(next.id);
+  };
+
+  const openAtlasView = (view: AtlasView, nextSelection?: Selection) => {
+    setScreen('atlas');
+    setActiveView(view);
+
+    if (nextSelection) {
+      setSelection(nextSelection);
+      return;
+    }
+
+    if (view === 'system-map') {
+      setSelection({ type: 'project', id: 'project-application' });
+    }
+
+    if (view === 'method-paths') {
+      setSelection({ type: 'method-path', id: methodPath.id });
+    }
+
+    if (view === 'rules') {
+      setSelection({ type: 'warning', id: warning.id });
+    }
+
+    if (view === 'change-impact') {
+      setSelection({ type: 'change-impact', id: changeImpact.id });
+    }
   };
 
   return (
     <main className="app-shell">
-      <TopBar screen={screen} setScreen={setScreen} />
+      <TopBar screen={screen} setScreen={setScreen} openAtlasView={openAtlasView} />
       {screen === 'welcome' && <Welcome onOpen={goNext} />}
       {screen === 'scan-progress' && <ScanProgress onComplete={goNext} />}
-      {screen === 'scan-summary' && <ScanSummary onExplore={goNext} />}
-      {screen === 'system-map' && (
+      {screen === 'scan-summary' && <ScanSummary onExplore={() => openAtlasView('system-map')} />}
+      {screen === 'atlas' && (
         <AtlasScreen
-          activeView="system-map"
-          selected="project"
+          activeView={activeView}
+          selection={selection}
+          setSelection={setSelection}
+          openAtlasView={openAtlasView}
           insightsCollapsed={insightsCollapsed}
           setInsightsCollapsed={setInsightsCollapsed}
-          onSelectClass={() => setScreen('class-insights')}
-          onOpenPath={() => setScreen('method-path')}
-          onOpenImpact={() => setScreen('change-impact')}
-        />
-      )}
-      {screen === 'class-insights' && (
-        <AtlasScreen
-          activeView="system-map"
-          selected="class"
-          insightsCollapsed={insightsCollapsed}
-          setInsightsCollapsed={setInsightsCollapsed}
-          onSelectClass={() => setScreen('class-insights')}
-          onOpenPath={() => setScreen('method-path')}
-          onOpenImpact={() => setScreen('change-impact')}
-        />
-      )}
-      {screen === 'method-path' && (
-        <AtlasScreen
-          activeView="method-paths"
-          selected="path"
-          insightsCollapsed={insightsCollapsed}
-          setInsightsCollapsed={setInsightsCollapsed}
-          onSelectClass={() => setScreen('class-insights')}
-          onOpenPath={() => setScreen('method-path')}
-          onOpenImpact={() => setScreen('change-impact')}
-        />
-      )}
-      {screen === 'change-impact' && (
-        <AtlasScreen
-          activeView="change-impact"
-          selected="impact"
-          insightsCollapsed={insightsCollapsed}
-          setInsightsCollapsed={setInsightsCollapsed}
-          onSelectClass={() => setScreen('class-insights')}
-          onOpenPath={() => setScreen('method-path')}
-          onOpenImpact={() => setScreen('change-impact')}
         />
       )}
     </main>
   );
 }
 
-function TopBar({ screen, setScreen }: { screen: Screen; setScreen: (screen: Screen) => void }) {
+function TopBar({
+  screen,
+  setScreen,
+  openAtlasView,
+}: {
+  screen: Screen;
+  setScreen: (screen: Screen) => void;
+  openAtlasView: (view: AtlasView) => void;
+}) {
   return (
     <header className="top-bar">
       <div>
@@ -98,11 +118,11 @@ function TopBar({ screen, setScreen }: { screen: Screen; setScreen: (screen: Scr
         <span className="muted"> / {fakeData.repository.name}</span>
       </div>
       <nav className="flow-nav" aria-label="Prototype flow">
-        {screens.map((item) => (
+        {flowScreens.map((item) => (
           <button
             key={item.id}
             className={screen === item.id ? 'active' : ''}
-            onClick={() => setScreen(item.id)}
+            onClick={() => item.id === 'atlas' ? openAtlasView('system-map') : setScreen(item.id)}
           >
             {item.label}
           </button>
@@ -220,52 +240,66 @@ function Metric({ label, value }: { label: string; value: number }) {
 
 function AtlasScreen({
   activeView,
-  selected,
+  selection,
+  setSelection,
+  openAtlasView,
   insightsCollapsed,
   setInsightsCollapsed,
-  onSelectClass,
-  onOpenPath,
-  onOpenImpact,
 }: {
-  activeView: string;
-  selected: 'project' | 'class' | 'path' | 'impact';
+  activeView: AtlasView;
+  selection: Selection;
+  setSelection: (selection: Selection) => void;
+  openAtlasView: (view: AtlasView, selection?: Selection) => void;
   insightsCollapsed: boolean;
   setInsightsCollapsed: (collapsed: boolean) => void;
-  onSelectClass: () => void;
-  onOpenPath: () => void;
-  onOpenImpact: () => void;
 }) {
   return (
     <section className={`atlas-layout ${insightsCollapsed ? 'insights-collapsed' : ''}`}>
       <aside className="explorer-panel">
-        <Explorer activeView={activeView} onOpenPath={onOpenPath} onOpenImpact={onOpenImpact} />
+        <Explorer activeView={activeView} selection={selection} setSelection={setSelection} openAtlasView={openAtlasView} />
       </aside>
       <section className="software-atlas">
-        <AtlasMap selected={selected} onSelectClass={onSelectClass} onOpenPath={onOpenPath} />
+        <AtlasMap activeView={activeView} selection={selection} setSelection={setSelection} openAtlasView={openAtlasView} />
       </section>
       <aside className="insights-panel">
         <button className="collapse-button" onClick={() => setInsightsCollapsed(!insightsCollapsed)}>
           {insightsCollapsed ? '>' : '<'}
         </button>
-        {!insightsCollapsed && <Insights selected={selected} onOpenPath={onOpenPath} onOpenImpact={onOpenImpact} />}
+        {!insightsCollapsed && <Insights selection={selection} openAtlasView={openAtlasView} />}
       </aside>
     </section>
   );
 }
 
-function Explorer({ activeView, onOpenPath, onOpenImpact }: { activeView: string; onOpenPath: () => void; onOpenImpact: () => void }) {
+function Explorer({
+  activeView,
+  selection,
+  setSelection,
+  openAtlasView,
+}: {
+  activeView: AtlasView;
+  selection: Selection;
+  setSelection: (selection: Selection) => void;
+  openAtlasView: (view: AtlasView, selection?: Selection) => void;
+}) {
   return (
     <div>
       <PanelTitle title="Explorer" subtitle="Views first" />
       <h3>Views</h3>
-      <button className={`nav-row ${activeView === 'system-map' ? 'active' : ''}`}>System Map</button>
-      <button className={`nav-row ${activeView === 'method-paths' ? 'active' : ''}`} onClick={onOpenPath}>Method Paths</button>
-      <button className="nav-row">Rules</button>
-      <button className={`nav-row ${activeView === 'change-impact' ? 'active' : ''}`} onClick={onOpenImpact}>Change Impact</button>
+      <button className={`nav-row ${activeView === 'system-map' ? 'active' : ''}`} onClick={() => openAtlasView('system-map')}>System Map</button>
+      <button className={`nav-row ${activeView === 'method-paths' ? 'active' : ''}`} onClick={() => openAtlasView('method-paths')}>Method Paths</button>
+      <button className={`nav-row ${activeView === 'rules' ? 'active' : ''}`} onClick={() => openAtlasView('rules')}>Rules</button>
+      <button className={`nav-row ${activeView === 'change-impact' ? 'active' : ''}`} onClick={() => openAtlasView('change-impact')}>Change Impact</button>
 
       <h3>Projects</h3>
       {fakeData.projects.map((project) => (
-        <button key={project.id} className={`nav-row ${project.id === selectedProject.id ? 'selected' : ''}`}>
+        <button
+          key={project.id}
+          className={`nav-row ${selection.type === 'project' && selection.id === project.id ? 'selected' : ''}`}
+          onClick={() => {
+            openAtlasView('system-map', { type: 'project', id: project.id });
+          }}
+        >
           {project.name.replace('OrderFlow.', '')}
         </button>
       ))}
@@ -274,23 +308,53 @@ function Explorer({ activeView, onOpenPath, onOpenImpact }: { activeView: string
       {fakeData.classes
         .filter((item) => item.projectId === 'project-application')
         .map((item) => (
-          <button key={item.id} className={`nav-row ${item.id === selectedClass.id ? 'selected' : ''}`}>
+          <button
+            key={item.id}
+            className={`nav-row ${selection.type === 'class' && selection.id === item.id ? 'selected' : ''}`}
+            onClick={() => {
+              openAtlasView('system-map', { type: 'class', id: item.id });
+            }}
+          >
             {item.name}
           </button>
         ))}
+
+      <h3>Warnings</h3>
+      <button
+        className={`nav-row ${selection.type === 'warning' ? 'selected' : ''}`}
+        onClick={() => openAtlasView('rules', { type: 'warning', id: warning.id })}
+      >
+        ⚠ {warning.title}
+      </button>
     </div>
   );
 }
 
-function AtlasMap({ selected, onSelectClass, onOpenPath }: { selected: string; onSelectClass: () => void; onOpenPath: () => void }) {
-  const nodes = fakeData.graph.nodes;
+function AtlasMap({
+  activeView,
+  selection,
+  setSelection,
+  openAtlasView,
+}: {
+  activeView: AtlasView;
+  selection: Selection;
+  setSelection: (selection: Selection) => void;
+  openAtlasView: (view: AtlasView, selection?: Selection) => void;
+}) {
+  const title = activeView === 'change-impact'
+    ? 'Change Impact'
+    : activeView === 'method-paths'
+      ? 'Order Import Flow'
+      : activeView === 'rules'
+        ? 'Architecture Rules'
+        : 'System Map';
 
   return (
     <div className="map-surface">
       <div className="map-header">
         <div>
           <p className="eyebrow">Software Atlas</p>
-          <h2>{selected === 'impact' ? 'Change Impact' : selected === 'path' ? 'Order Import Flow' : 'System Map'}</h2>
+          <h2>{title}</h2>
         </div>
         <div className="legend">
           <span>● normal</span>
@@ -300,27 +364,70 @@ function AtlasMap({ selected, onSelectClass, onOpenPath }: { selected: string; o
       </div>
 
       <div className="graph-canvas">
-        {nodes.map((node) => (
-          <button
-            key={node.id}
-            className={`graph-node level-${node.level} ${node.isChanged ? 'changed' : ''} ${selected === 'project' && node.id === selectedProject.id ? 'selected' : ''}`}
-            onClick={node.id === 'project-application' ? onSelectClass : undefined}
-          >
-            <span>{node.isChanged ? '◆' : '●'}</span>
-            {node.label}
-          </button>
-        ))}
-        <div className="graph-line line-api-app" />
-        <div className="graph-line line-app-domain" />
-        <div className="graph-line line-app-infra" />
-        <div className="graph-line line-app-msg warning-line" />
-        <div className="graph-line line-infra-sql" />
-        <div className="graph-line line-msg-bus warning-line" />
+        <svg className="edge-layer" viewBox="0 0 860 740" preserveAspectRatio="none" aria-hidden="true">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+              <path d="M0,0 L0,6 L9,3 z" />
+            </marker>
+          </defs>
+          {fakeData.graph.edges.map((edge) => {
+            const source = atlasNodePositions.find((node) => node.id === edge.source);
+            const target = atlasNodePositions.find((node) => node.id === edge.target);
+            if (!source || !target) return null;
+
+            const isWarning = edge.warningId === warning.id;
+            const isChanged = Boolean(edge.isChanged) || activeView === 'change-impact' && changeImpact.changedEdges.includes(edge.id);
+            const isDimmed = activeView === 'change-impact' && !isChanged;
+
+            return (
+              <path
+                key={edge.id}
+                className={`edge-path ${isWarning ? 'warning' : ''} ${isChanged ? 'changed' : ''} ${isDimmed ? 'dimmed' : ''}`}
+                d={`M ${source.x + 82} ${source.y + 36} C ${source.x + 130} ${source.y + 36}, ${target.x - 40} ${target.y + 36}, ${target.x} ${target.y + 36}`}
+                markerEnd="url(#arrow)"
+              />
+            );
+          })}
+        </svg>
+
+        {atlasNodePositions.map((position) => {
+          const graphNode = fakeData.graph.nodes.find((node) => node.id === position.id);
+          const isSelected = selection.id === position.id;
+          const isChanged = Boolean(graphNode?.isChanged) || activeView === 'change-impact' && changeImpact.changedNodes.includes(position.id);
+          const isDimmed = activeView === 'change-impact' && !isChanged;
+
+          return (
+            <button
+              key={position.id}
+              className={`graph-node ${isSelected ? 'selected' : ''} ${isChanged ? 'changed' : ''} ${isDimmed ? 'dimmed' : ''}`}
+              style={{ left: position.x, top: position.y }}
+              onClick={() => {
+                const project = fakeData.projects.find((item) => item.id === position.id);
+                const external = fakeData.externalSystems.find((item) => item.id === position.id);
+
+                if (project) {
+                  setSelection({ type: 'project', id: project.id });
+                }
+
+                if (external) {
+                  setSelection({ type: 'external-system', id: external.id });
+                }
+              }}
+            >
+              <span>{isChanged ? '◆' : '●'}</span>
+              {position.label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="path-strip">
         {methodPath.steps.map((step) => (
-          <button key={step.methodId} className={step.isChanged ? 'changed-step' : ''} onClick={onOpenPath}>
+          <button
+            key={step.methodId}
+            className={step.isChanged ? 'changed-step' : ''}
+            onClick={() => openAtlasView('method-paths', { type: 'method-path', id: methodPath.id })}
+          >
             {step.order}. {step.label}
           </button>
         ))}
@@ -329,57 +436,81 @@ function AtlasMap({ selected, onSelectClass, onOpenPath }: { selected: string; o
   );
 }
 
-function Insights({ selected, onOpenPath, onOpenImpact }: { selected: 'project' | 'class' | 'path' | 'impact'; onOpenPath: () => void; onOpenImpact: () => void }) {
-  if (selected === 'class') {
-    return <ClassInsights onOpenPath={onOpenPath} onOpenImpact={onOpenImpact} />;
+function Insights({ selection, openAtlasView }: { selection: Selection; openAtlasView: (view: AtlasView, selection?: Selection) => void }) {
+  if (selection.type === 'class') {
+    const item = fakeData.classes.find((classItem) => classItem.id === selection.id);
+    return item ? <ClassInsights item={item} openAtlasView={openAtlasView} /> : null;
   }
 
-  if (selected === 'path') {
-    return <MethodPathInsights onOpenImpact={onOpenImpact} />;
+  if (selection.type === 'method-path') {
+    return <MethodPathInsights openAtlasView={openAtlasView} />;
   }
 
-  if (selected === 'impact') {
+  if (selection.type === 'warning') {
+    return <WarningInsights openAtlasView={openAtlasView} />;
+  }
+
+  if (selection.type === 'change-impact') {
     return <ChangeImpactInsights />;
   }
 
-  return <ProjectInsights onOpenPath={onOpenPath} onOpenImpact={onOpenImpact} />;
+  if (selection.type === 'external-system') {
+    const item = fakeData.externalSystems.find((system) => system.id === selection.id);
+    return item ? <ExternalSystemInsights item={item} /> : null;
+  }
+
+  const project = fakeData.projects.find((item) => item.id === selection.id) ?? fakeData.projects[1];
+  return <ProjectInsights project={project} openAtlasView={openAtlasView} />;
 }
 
-function ProjectInsights({ onOpenPath, onOpenImpact }: { onOpenPath: () => void; onOpenImpact: () => void }) {
+function ProjectInsights({ project, openAtlasView }: { project: typeof fakeData.projects[number]; openAtlasView: (view: AtlasView, selection?: Selection) => void }) {
+  const projectClasses = fakeData.classes.filter((item) => item.projectId === project.id);
+
   return (
     <div>
-      <PanelTitle title="Application" subtitle="Selected project" />
-      <InsightSection title="Purpose" evidence={selectedProject.evidence}>{selectedProject.description}</InsightSection>
-      <InsightSection title="Used by" evidence="Derived from graph">OrderFlow.Api</InsightSection>
-      <InsightSection title="Depends on" evidence="Verified from code">Domain, Infrastructure, Messaging</InsightSection>
-      <InsightSection title="Source" evidence="Verified from code">{selectedProject.sourceLocation.path}</InsightSection>
-      <button className="secondary-button" onClick={onOpenPath}>View Order Import Flow</button>
-      <button className="secondary-button" onClick={onOpenImpact}>View Change Impact</button>
+      <PanelTitle title={project.name.replace('OrderFlow.', '')} subtitle="Selected project" />
+      <InsightSection title="Purpose" evidence={project.evidence}>{project.description}</InsightSection>
+      <InsightSection title="Classes" evidence="Verified from code">{projectClasses.length || 'None in fake data yet'}</InsightSection>
+      <InsightSection title="Source" evidence="Verified from code">{project.sourceLocation.path}</InsightSection>
+      <button className="secondary-button" onClick={() => openAtlasView('method-paths')}>View Order Import Flow</button>
+      <button className="secondary-button" onClick={() => openAtlasView('change-impact')}>View Change Impact</button>
     </div>
   );
 }
 
-function ClassInsights({ onOpenPath, onOpenImpact }: { onOpenPath: () => void; onOpenImpact: () => void }) {
+function ClassInsights({ item, openAtlasView }: { item: typeof fakeData.classes[number]; openAtlasView: (view: AtlasView, selection?: Selection) => void }) {
   return (
     <div>
-      <PanelTitle title={selectedClass.name} subtitle="Selected class" />
-      <InsightSection title="Purpose" evidence={selectedClass.purpose.evidence}>{selectedClass.purpose.text}</InsightSection>
-      <InsightSection title="Part of" evidence={selectedClass.role.evidence}>{selectedClass.role.text}</InsightSection>
+      <PanelTitle title={item.name} subtitle="Selected class" />
+      <InsightSection title="Purpose" evidence={item.purpose.evidence}>{item.purpose.text}</InsightSection>
+      <InsightSection title="Part of" evidence={item.role.evidence}>{item.role.text}</InsightSection>
       <InsightSection title="Calls" evidence="Verified from code">
-        {selectedClass.calls.map((id) => fakeData.classes.find((item) => item.id === id)?.name).filter(Boolean).join(', ')}
+        {item.calls.map((id) => fakeData.classes.find((classItem) => classItem.id === id)?.name ?? fakeData.externalSystems.find((system) => system.id === id)?.name).filter(Boolean).join(', ') || 'None'}
       </InsightSection>
       <InsightSection title="Source" evidence="Verified from code">
-        {selectedClass.sourceLocation.path}<br />line {selectedClass.sourceLocation.line}
+        {item.sourceLocation.path}<br />line {item.sourceLocation.line}
       </InsightSection>
       <button className="secondary-button">Open in editor</button>
       <button className="secondary-button">Copy path</button>
-      <button className="secondary-button" onClick={onOpenPath}>View Method Path</button>
-      <button className="secondary-button" onClick={onOpenImpact}>View Change Impact</button>
+      <button className="secondary-button" onClick={() => openAtlasView('method-paths')}>View Method Path</button>
+      <button className="secondary-button" onClick={() => openAtlasView('change-impact')}>View Change Impact</button>
     </div>
   );
 }
 
-function MethodPathInsights({ onOpenImpact }: { onOpenImpact: () => void }) {
+function ExternalSystemInsights({ item }: { item: typeof fakeData.externalSystems[number] }) {
+  return (
+    <div>
+      <PanelTitle title={item.name} subtitle="External system" />
+      <InsightSection title="Purpose" evidence={item.evidence}>{item.description}</InsightSection>
+      <InsightSection title="Used by" evidence="Derived from graph">
+        {fakeData.graph.edges.filter((edge) => edge.target === item.id).map((edge) => atlasNodePositions.find((node) => node.id === edge.source)?.label).join(', ')}
+      </InsightSection>
+    </div>
+  );
+}
+
+function MethodPathInsights({ openAtlasView }: { openAtlasView: (view: AtlasView, selection?: Selection) => void }) {
   return (
     <div>
       <PanelTitle title={methodPath.name} subtitle="Method path" />
@@ -393,7 +524,22 @@ function MethodPathInsights({ onOpenImpact }: { onOpenImpact: () => void }) {
           return <p key={step.methodId}>{method?.fullName}: line {method?.sourceLocation.line}</p>;
         })}
       </InsightSection>
-      <button className="secondary-button" onClick={onOpenImpact}>View Change Impact</button>
+      <button className="secondary-button" onClick={() => openAtlasView('rules')}>View Warning</button>
+      <button className="secondary-button" onClick={() => openAtlasView('change-impact')}>View Change Impact</button>
+    </div>
+  );
+}
+
+function WarningInsights({ openAtlasView }: { openAtlasView: (view: AtlasView, selection?: Selection) => void }) {
+  return (
+    <div>
+      <PanelTitle title={warning.title} subtitle="Architecture warning" />
+      <InsightSection title="Summary" evidence={warning.evidence}>{warning.summary}</InsightSection>
+      <InsightSection title="Why it matters" evidence="Rule explanation">{warning.whyItMatters}</InsightSection>
+      <InsightSection title="Source" evidence="Verified from code">
+        {warning.sourceLocations.map((item) => <p key={`${item.path}-${item.line}`}>{item.path}: line {item.line}</p>)}
+      </InsightSection>
+      <button className="secondary-button" onClick={() => openAtlasView('change-impact')}>View Change Impact</button>
     </div>
   );
 }
