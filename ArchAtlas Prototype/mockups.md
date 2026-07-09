@@ -8,7 +8,7 @@ They are intentionally rough. The goal is to test the product flow and core expe
 
 ArchAtlas should feel like:
 
-> Google Maps over your codebase.
+> A map for your codebase.
 
 The **Software Atlas** is the hero. Explorer and Insights are supporting panels.
 
@@ -23,7 +23,10 @@ Give the user a clear first action and communicate the product promise.
 |                                                                                |
 |                                  ArchAtlas                                     |
 |                                                                                |
-|                       Understand software systems.                             |
+|                         A map for your codebase.                               |
+|                                                                                |
+|     Understand software systems from architecture overview to method-level     |
+|                                    paths.                                      |
 |                                                                                |
 |                              [ Open Repository ]                               |
 |                                                                                |
@@ -54,6 +57,7 @@ Give the user a clear first action and communicate the product promise.
 - The main action is `Open Repository`.
 - Recent projects should make returning to a repo feel fast.
 - Privacy promise is visible immediately.
+- Avoid using third-party trademarked names in product copy.
 
 ## Mockup 2: Repository scanning
 
@@ -144,19 +148,19 @@ Make the map the hero while still offering structure and context.
 +--------------------------------------------------------------------------------+
 | Menu | Explorer                    | Software Atlas                | Insights  |
 |------|-----------------------------|-------------------------------|-----------|
-|      | Solution                    |                               | Selected  |
+|      | Views                       |                               | Selected  |
 |      |                             |            ○ API              |           |
-|      | ▾ Projects                  |              │                | Solution  |
-|      |   • API                     |              ▼                |           |
-|      |   • Application             |       ○ Application           | Purpose   |
-|      |   • Domain                  |              │                | System    |
-|      |   • Infrastructure          |              ▼                | overview  |
-|      |                             |          ○ Domain             |           |
-|      | ▾ Views                     |              │                | Contains  |
-|      |   • System Map              |              ▼                | 18 projects|
-|      |   • Method Paths            |    ○ Infrastructure           | 934 classes|
-|      |   • Rules                   |              │                |           |
-|      |   • AI Changes              |              ▼                | Warnings  |
+|      |   • System Map ◀ active     |              │                | Solution  |
+|      |   • Method Paths            |              ▼                |           |
+|      |   • Rules                   |       ○ Application           | Purpose   |
+|      |   • AI Changes              |              │                | System    |
+|      |                             |              ▼                | overview  |
+|      | ▾ Projects                  |          ○ Domain             |           |
+|      |   • API                     |              │                | Contains  |
+|      |   • Application             |              ▼                | 18 projects|
+|      |   • Domain                  |    ○ Infrastructure           | 934 classes|
+|      |   • Infrastructure          |              │                |           |
+|      |                             |              ▼                | Warnings  |
 |      |                             |        ○ SQL Server           | ⚠ 2       |
 |      |                             |                               |           |
 +--------------------------------------------------------------------------------+
@@ -166,6 +170,7 @@ Make the map the hero while still offering structure and context.
 
 - The map is the center and should take most of the space.
 - Explorer is navigation, not the main product.
+- Views are shown before Projects because the user first chooses how to understand the system.
 - Insights explains the selected element.
 - Search should be available globally.
 
@@ -181,20 +186,23 @@ Show that selecting a node explains its role in the system.
 +--------------------------------------------------------------------------------+
 | Menu | Explorer                    | Software Atlas                | Insights  |
 |------|-----------------------------|-------------------------------|-----------|
-|      | Solution                    |                               | Application|
+|      | Views                       |                               | Application|
 |      |                             |            ○ API              |           |
-|      | ▾ Projects                  |              │                | Purpose   |
-|      |   • API                     |              ▼                | Coordinates|
-|      |   • Application  ◀ selected |       ◎ Application           | business  |
-|      |   • Domain                  |          /       \            | flows     |
-|      |   • Infrastructure          |         ▼         ▼           |           |
-|      |                             |   ○ Domain     ○ Messaging    | Used by   |
-|      | ▾ Application               |         │                     | API       |
-|      |   • Handlers                |         ▼                     | Worker    |
-|      |   • Validators              |  ○ Infrastructure             |           |
-|      |   • Services                |                               | Depends on|
+|      |   • System Map ◀ active     |              │                | Purpose   |
+|      |   • Method Paths            |              ▼                | Coordinates|
+|      |   • Rules                   |       ◎ Application           | business  |
+|      |   • AI Changes              |          /       \            | flows     |
+|      |                             |         ▼         ▼           |           |
+|      | ▾ Projects                  |   ○ Domain     ○ Messaging    | Used by   |
+|      |   • API                     |         │                     | API       |
+|      |   • Application  ◀ selected |         ▼                     | Worker    |
+|      |   • Domain                  |  ○ Infrastructure             |           |
+|      |   • Infrastructure          |                               | Depends on|
 |      |                             |                               | Domain    |
-|      |                             |                               | Messaging |
+|      | ▾ Application               |                               | Messaging |
+|      |   • Handlers                |                               |           |
+|      |   • Validators              |                               |           |
+|      |   • Services                |                               |           |
 +--------------------------------------------------------------------------------+
 ```
 
