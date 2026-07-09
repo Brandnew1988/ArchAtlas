@@ -49,6 +49,37 @@ Recommended behavior:
 - Collapsed state should remain easy to reopen.
 - The first prototype should support this interaction if it is cheap to implement.
 
+## Navigation decision: Logical objects first, source location always available
+
+The left Explorer should primarily show logical architecture objects, not a full file tree.
+
+Reason:
+
+- ArchAtlas is for understanding the system, not replacing VS Code, Rider, or Visual Studio.
+- A file tree would make the product feel too much like an IDE.
+- The user should understand what happens in the code and where to look next.
+- If the user has VS Code open beside ArchAtlas, ArchAtlas should make it clear which file/class/method is relevant.
+
+Recommended behavior:
+
+- Explorer shows Views first.
+- Explorer shows logical objects such as Projects, Modules, Namespaces, Classes, Method Paths, Rules, and Warnings.
+- Insights always shows source location when available.
+- Source location should include project, namespace, file path, and optionally line number.
+- Later versions can support `Open in VS Code`, `Open in Rider`, or `Copy path` actions.
+
+Example source location:
+
+```text
+Source
+Project: OrderFlow.Application
+Namespace: OrderFlow.Application.Orders
+File: src/OrderFlow.Application/Orders/OrderHandler.cs
+Line: 42
+
+[ Open in editor ] [ Copy path ]
+```
+
 ## Mockup 1: Welcome / start screen
 
 ### Goal
@@ -241,8 +272,8 @@ Show that selecting a node explains its role in the system.
 |      |                             |                               | Domain    |
 |      | ▾ Application               |                               | Messaging |
 |      |   • Handlers                |                               |           |
-|      |   • Validators              |                               |           |
-|      |   • Services                |                               |           |
+|      |   • Validators              |                               | Source    |
+|      |   • Services                |                               | /src/...  |
 +--------------------------------------------------------------------------------+
 ```
 
@@ -252,6 +283,7 @@ Show that selecting a node explains its role in the system.
 - It should explain purpose, usage, relationships, and risk.
 - Purpose may be deterministic, inferred, or AI-assisted later.
 - If purpose is unknown, the UI should say so honestly.
+- Insights should include source location when it helps the user know where to inspect the code.
 
 ## Mockup 6: Class selected — Insights first, metadata second
 
@@ -282,9 +314,10 @@ Show class-level understanding without becoming a property grid.
 |      |                             |                               | Repository|
 |      |                             |                               | Publisher |
 |      |                             |                               |           |
-|      |                             |                               | Data      |
-|      |                             |                               | Confidence|
-|      |                             |                               | Mixed     |
+|      |                             |                               | Source    |
+|      |                             |                               | src/...   |
+|      |                             |                               | line 42   |
+|      |                             |                               | [Open]    |
 +--------------------------------------------------------------------------------+
 ```
 
@@ -294,6 +327,7 @@ Show class-level understanding without becoming a property grid.
 - Insights explains purpose and role.
 - It should also show confidence/source when the purpose is inferred.
 - Metadata like method count should be secondary.
+- Source location should help the user know where to look in VS Code, Rider, or Visual Studio.
 
 ## Mockup 7: Method path highlight
 
@@ -319,9 +353,9 @@ Make method path exploration feel alive, like route navigation.
 |      |                             |       ▼                       | SQL Server|
 |      |                             |   4 ◎ Save() ───────► SQL     | ServiceBus|
 |      |                             |       │                       |           |
-|      |                             |       ▼                       | Warnings  |
-|      |                             |   5 ◎ Publish() ───► Queue    | None      |
-|      |                             |                               |           |
+|      |                             |       ▼                       | Source    |
+|      |                             |   5 ◎ Publish() ───► Queue    | Run():42  |
+|      |                             |                               | Save():88 |
 +--------------------------------------------------------------------------------+
 ```
 
@@ -329,7 +363,7 @@ Make method path exploration feel alive, like route navigation.
 
 - The path should animate/highlight when selected.
 - It should feel like a route through the system.
-- The Insights panel explains path length, touched systems, and warnings.
+- The Insights panel explains path length, touched systems, warnings, and where to inspect key code locations.
 
 ## Mockup 8: Architecture warning
 
@@ -353,6 +387,10 @@ Warnings should explain why something matters.
 |      |                             |   ○ SQL Server                | Run()     |
 |      |                             |                               | -> Save() |
 |      |                             |                               |           |
+|      |                             |                               | Source    |
+|      |                             |                               | API/...   |
+|      |                             |                               | line 42   |
+|      |                             |                               |           |
 |      |                             |                               | Why it    |
 |      |                             |                               | matters   |
 |      |                             |                               | API should|
@@ -366,7 +404,7 @@ Warnings should explain why something matters.
 
 - Warnings should be actionable.
 - The map should show where the issue occurs.
-- Insights should explain the rule and why it matters.
+- Insights should explain the rule, why it matters, and where in code the user should inspect.
 
 ## Mockup 9: AI changes layer
 
@@ -391,8 +429,8 @@ Show AI as an overlay, not the whole product.
 |      |                             |         │                     | Impact    |
 |      | 2 new dependencies          |         ▼                     | 2 deps    |
 |      | 1 rule violation            |  ◉ Infrastructure             | 1 warning |
-|      | 3 affected paths            |                               | 3 paths   |
-|      |                             |                               |           |
+|      | 3 affected paths            |                               | Look at   |
+|      |                             |                               | 5 files   |
 +--------------------------------------------------------------------------------+
 ```
 
@@ -401,14 +439,15 @@ Show AI as an overlay, not the whole product.
 - AI Changes is a layer on the atlas.
 - The map remains the hero.
 - The product should work without this view.
+- AI/change impact should help the user know where to inspect code next.
 
 ## Key open questions after first mockups
 
-1. Should the left Explorer show files ever, or only logical architecture objects?
-2. How should confidence be shown without making the UI noisy?
-3. Should the first prototype include AI Changes, or only System Map + Method Paths + Warnings?
-4. Should warnings appear as badges on nodes or only as a separate overlay?
-5. How much animation is useful before it becomes distracting?
+1. How should confidence be shown without making the UI noisy?
+2. Should the first prototype include AI Changes, or only System Map + Method Paths + Warnings?
+3. Should warnings appear as badges on nodes or only as a separate overlay?
+4. How much animation is useful before it becomes distracting?
+5. How should `Open in editor` work across VS Code, Rider, and Visual Studio?
 
 ## Current recommended prototype flow
 
