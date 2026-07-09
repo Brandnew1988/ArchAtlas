@@ -1,3 +1,4 @@
+import * as React from 'react';
 import fakeData from '../../fake-data.json';
 
 type Screen =
