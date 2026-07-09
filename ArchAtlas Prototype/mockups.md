@@ -12,6 +12,25 @@ ArchAtlas should feel like:
 
 The **Software Atlas** is the hero. Explorer and Insights are supporting panels.
 
+## Flow decision: Scan Summary
+
+The first prototype should include **Scan Summary** as a separate screen between scan progress and the atlas.
+
+Reason:
+
+- It gives the user a calm overview before opening the map.
+- It helps the user understand what ArchAtlas found.
+- It reduces the jump from selecting a repository to seeing an interactive atlas.
+- It reinforces that ArchAtlas is a system-understanding tool, not just a graph viewer.
+
+Recommended behavior:
+
+- First scan of a repository: show Scan Summary.
+- New scan with meaningful changes: show Scan Summary.
+- Returning to a recently opened repository: open directly in Atlas and show a small scan/update status instead.
+
+The Scan Summary should not become a dashboard. It should act as a simple bridge into the Atlas.
+
 ## Mockup 1: Welcome / start screen
 
 ### Goal
@@ -135,6 +154,8 @@ Give the user a quick understanding before opening the full atlas.
 - It teaches the user something before the atlas opens.
 - It should not become a dashboard.
 - The primary next action is `Explore Atlas`.
+- First scans and meaningful rescans should show this screen.
+- Returning to a known repository can open directly in Atlas.
 
 ## Mockup 4: Main atlas view — system level
 
@@ -364,13 +385,12 @@ Show AI as an overlay, not the whole product.
 
 ## Key open questions after first mockups
 
-1. Should scan summary be mandatory, or should the atlas open directly?
-2. Should Insights be collapsible?
-3. Should the left Explorer show files ever, or only logical architecture objects?
-4. How should confidence be shown without making the UI noisy?
-5. Should the first prototype include AI Changes, or only System Map + Method Paths + Warnings?
-6. Should warnings appear as badges on nodes or only as a separate overlay?
-7. How much animation is useful before it becomes distracting?
+1. Should Insights be collapsible?
+2. Should the left Explorer show files ever, or only logical architecture objects?
+3. How should confidence be shown without making the UI noisy?
+4. Should the first prototype include AI Changes, or only System Map + Method Paths + Warnings?
+5. Should warnings appear as badges on nodes or only as a separate overlay?
+6. How much animation is useful before it becomes distracting?
 
 ## Current recommended prototype flow
 
