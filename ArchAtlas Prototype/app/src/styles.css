@@ -278,12 +278,12 @@ button {
 .atlas-layout {
   flex: 1;
   display: grid;
-  grid-template-columns: 260px 1fr 340px;
+  grid-template-columns: 260px minmax(780px, 1fr) 360px;
   min-height: 0;
 }
 
 .atlas-layout.insights-collapsed {
-  grid-template-columns: 260px 1fr 48px;
+  grid-template-columns: 260px minmax(780px, 1fr) 48px;
 }
 
 .explorer-panel,
@@ -335,14 +335,15 @@ button {
 }
 
 .nav-row.selected {
-  border: 1px solid rgba(104, 136, 255, 0.28);
+  border: 1px solid rgba(104, 136, 255, 0.38);
   color: #ffffff;
+  background: rgba(104, 136, 255, 0.11);
 }
 
 .map-surface {
   position: relative;
   height: calc(100vh - 112px);
-  min-height: 640px;
+  min-height: 720px;
   padding: 24px;
   border-radius: 28px;
   background:
@@ -361,7 +362,7 @@ button {
   justify-content: space-between;
   gap: 24px;
   position: relative;
-  z-index: 2;
+  z-index: 4;
 }
 
 .legend {
@@ -373,19 +374,66 @@ button {
 
 .graph-canvas {
   position: absolute;
-  inset: 110px 32px 140px;
+  left: 24px;
+  right: 24px;
+  top: 96px;
+  bottom: 110px;
+  min-width: 860px;
+}
+
+.edge-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  z-index: 1;
+}
+
+.edge-layer marker path {
+  fill: rgba(159, 175, 210, 0.74);
+}
+
+.edge-path {
+  fill: none;
+  stroke: rgba(159, 175, 210, 0.54);
+  stroke-width: 2.2;
+  transition: opacity 160ms ease, stroke-width 160ms ease, stroke 160ms ease;
+}
+
+.edge-path.changed {
+  stroke: rgba(75, 199, 160, 0.96);
+  stroke-width: 3.4;
+}
+
+.edge-path.warning {
+  stroke: rgba(255, 195, 92, 0.96);
+  stroke-width: 3.2;
+  filter: drop-shadow(0 0 8px rgba(255, 195, 92, 0.25));
+}
+
+.edge-path.dimmed {
+  opacity: 0.18;
 }
 
 .graph-node {
   position: absolute;
   z-index: 3;
-  width: 180px;
+  width: 165px;
+  min-height: 72px;
   padding: 16px;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(16, 24, 39, 0.94);
+  background: rgba(16, 24, 39, 0.96);
   color: #ffffff;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.32);
+  text-align: left;
+  transition: transform 140ms ease, border 140ms ease, opacity 140ms ease, background 140ms ease;
+}
+
+.graph-node:hover {
+  transform: translateY(-2px);
+  border-color: rgba(104, 136, 255, 0.62);
 }
 
 .graph-node span {
@@ -394,41 +442,18 @@ button {
 
 .graph-node.changed {
   border-color: rgba(75, 199, 160, 0.75);
+  background: rgba(20, 47, 44, 0.94);
   box-shadow: 0 0 0 1px rgba(75, 199, 160, 0.2), 0 16px 40px rgba(0, 0, 0, 0.32);
 }
 
 .graph-node.selected {
-  border-color: rgba(104, 136, 255, 0.9);
+  border-color: rgba(104, 136, 255, 0.95);
+  box-shadow: 0 0 0 2px rgba(104, 136, 255, 0.22), 0 16px 40px rgba(0, 0, 0, 0.32);
 }
 
-.level-1 { left: 8%; top: 4%; }
-.level-2 { left: 40%; top: 22%; }
-.level-3:nth-of-type(3) { left: 18%; top: 52%; }
-.level-3:nth-of-type(4) { left: 40%; top: 58%; }
-.level-3:nth-of-type(5) { left: 62%; top: 52%; }
-.level-4:nth-of-type(6) { left: 37%; top: 84%; }
-.level-4:nth-of-type(7) { left: 64%; top: 82%; }
-.level-4:nth-of-type(8) { left: 12%; top: 82%; }
-
-.graph-line {
-  position: absolute;
-  z-index: 1;
-  height: 2px;
-  background: rgba(153, 169, 199, 0.46);
-  transform-origin: left center;
+.graph-node.dimmed {
+  opacity: 0.38;
 }
-
-.warning-line {
-  background: rgba(255, 195, 92, 0.86);
-  box-shadow: 0 0 16px rgba(255, 195, 92, 0.25);
-}
-
-.line-api-app { left: 23%; top: 19%; width: 24%; transform: rotate(24deg); }
-.line-app-domain { left: 39%; top: 48%; width: 25%; transform: rotate(146deg); }
-.line-app-infra { left: 48%; top: 50%; width: 17%; transform: rotate(90deg); }
-.line-app-msg { left: 54%; top: 48%; width: 20%; transform: rotate(28deg); }
-.line-infra-sql { left: 49%; top: 76%; width: 15%; transform: rotate(90deg); }
-.line-msg-bus { left: 70%; top: 74%; width: 14%; transform: rotate(92deg); }
 
 .path-strip {
   position: absolute;
@@ -457,6 +482,7 @@ button {
 .path-strip button.changed-step {
   border-color: rgba(75, 199, 160, 0.55);
   color: #ffffff;
+  background: rgba(75, 199, 160, 0.09);
 }
 
 .collapse-button {
